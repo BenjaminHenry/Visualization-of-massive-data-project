@@ -1,13 +1,6 @@
-import matplotlib
-import scipy
-import os
 import numpy as np
 import pandas as pd
-import ipdb
-import seaborn as sns
-import plotly.express as px
 import matplotlib.pyplot as plt
-import csv
 
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -31,19 +24,23 @@ my_plot = np.column_stack((my_price, my_avail))
 randomRow = np.random.randint(len(my_avail), size=100)
 my_plot = my_plot[randomRow, :]
 
-#print(my_plot)
+choice = input("You can choose between [S]catter plot or [D]endogram\n")
 
-cluster = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
-cluster.fit_predict(my_plot)
-#print(cluster.labels_)
-plt.scatter(my_plot[:, 0], my_plot[:, 1], c=cluster.labels_, cmap='rainbow')
-plt.xlabel("price")
-plt.ylabel("availability")
-plt.show()
-input()
-
-my_link = linkage(my_plot, 'ward')
-plt.figure(figsize=(25, 10))
-dendrogram(my_link, leaf_rotation=90, leaf_font_size=8)
-plt.show()
-input()
+if choice in ['S', 's']:
+    cluster = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
+    cluster.fit_predict(my_plot)
+    #print(cluster.labels_)
+    plt.scatter(my_plot[:, 0], my_plot[:, 1], c=cluster.labels_, cmap='rainbow')
+    plt.xlabel("price")
+    plt.ylabel("availability")
+    plt.show()
+    input("Press enter to continue\n")
+elif choice in ['D', 'd']:
+    my_link = linkage(my_plot, 'ward')
+    plt.figure(figsize=(25, 10))
+    dendrogram(my_link, leaf_rotation=90, leaf_font_size=8)
+    plt.show()
+    input("Press enter to continue\n")
+else:
+    print("Sorry I don't recognise this input\n End of program\n")
+print("Program finished, time to drink coffee.\"")

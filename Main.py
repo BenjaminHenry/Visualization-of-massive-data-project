@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import csv
 
 from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+
 # Chargement du fichier CSV
 data = pd.read_csv("AB_NYC_2019.csv", index_col=0)
 
@@ -37,5 +39,11 @@ cluster.fit_predict(my_plot)
 plt.scatter(my_plot[:, 0], my_plot[:, 1], c=cluster.labels_, cmap='rainbow')
 plt.xlabel("price")
 plt.ylabel("availability")
+plt.show()
+input()
+
+my_link = linkage(my_plot, 'ward')
+plt.figure(figsize=(25, 10))
+dendrogram(my_link, leaf_rotation=90, leaf_font_size=8)
 plt.show()
 input()

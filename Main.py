@@ -6,6 +6,9 @@ import os
 from os import listdir
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
+from sklearn import svm
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 
 # Chargement du fichier CSV
 my_csvs = []
@@ -22,7 +25,13 @@ elif len(my_csvs) > 1:
 elif len(my_csvs) < 1:
     print("Sorry no cvs files found exiting program")
     exit(0)
+if my_chosenfile.casefold() in str(my_csvs).strip('[]').casefold():
+    print("You selected :", my_chosenfile)
+else:
+    print("Sorry, wrong selection, exiting program")
+    exit(0)
 data = pd.read_csv(my_chosenfile, index_col=0)
+
 
 #selection des colonne de type int ou float pour proposer le choix à l'utilisateur
 my_type = list(data.select_dtypes(include=['int64']).columns)
@@ -62,22 +71,21 @@ elif len(column2) > len(column1):
 my_plot = np.column_stack((column1, column2))
 
 # Selection de valeurs randoms dans les colonnes à observer
-if (len(column1) < 100):
+if (len(column1) < 5000):
     randomRow = np.random.randint(len(column1), size=len(column1))
 else:
-    randomRow = np.random.randint(len(column1), size=100)
+    randomRow = np.random.randint(len(column1), size=5000)
 my_plot = my_plot[randomRow, :]
 
 choice = input("You can choose between [S]catter plot or [D]endogram\n")
 
 if choice in ['S', 's']:
-    cluster = AgglomerativeClustering(n_clusters=3, affinity='euclidean', linkage='ward')
+    cluster = AgglomerativeClustering(n_clusters=2, affinity='euclidean', linkage='ward')
     cluster.fit_predict(my_plot)
     plt.scatter(my_plot[:, 0], my_plot[:, 1], c=cluster.labels_, cmap='rainbow')
     plt.xlabel(first_input)
     plt.ylabel(second_input)
     plt.show()
-    input("Press enter to continue")
 elif choice in ['D', 'd']:
     my_link = linkage(my_plot, 'ward')
     plt.figure(figsize=(25, 10))
@@ -85,7 +93,17 @@ elif choice in ['D', 'd']:
     plt.xlabel(first_input)
     plt.ylabel(second_input)
     plt.show()
-    input("Press enter to continue\n")
 else:
     print("Sorry I don't recognise this input\n End of program")
+
+#start of test for predictive model of one column as a function of another column
+#clf = svm.SVC(gamma=0.001, C=100)
+#clf.fit(my_plot.data[:-1], my_plot.target[:-1])
+#clf.predict(my_plot.data[:-1])
+
+#neigh = KNeighborsClassifier(n_neighbors=3)
+#neigh.fit(my_plot, my_plot)
+#pred = neigh.predict(my_plot)
+#print("KNeighbors accuracy score : ", accuracy_score(my_plot, pred))
+
 print("Program finished, time to drink coffee.")

@@ -1,15 +1,32 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
+from os import listdir
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
 
 # Chargement du fichier CSV
-data = pd.read_csv("AB_NYC_2019.csv", index_col=0)
+my_csvs = []
+my_files = listdir(os.getcwd())
+for my_files in my_files:
+    if my_files.endswith(".csv"):
+        my_csvs.append(my_files)
+if len(my_csvs) == 1:
+    print("1 csv file detected :", my_csvs)
+    print("Using :", my_csvs)
+elif len(my_csvs) > 1:
+    print("please select a file between these .csv found :", my_csvs)
+    my_chosenfile = input()
+elif len(my_csvs) < 1:
+    print("Sorry no cvs files found exiting program")
+    exit(0)
+data = pd.read_csv(my_chosenfile, index_col=0)
 
-#selection des colonne de type int pour proposer le choix à l'utilisateur
+#selection des colonne de type int ou float pour proposer le choix à l'utilisateur
 my_type = list(data.select_dtypes(include=['int64']).columns)
+my_type += (list(data.select_dtypes(include=['float64']).columns))
 
 # Selection des 2 colonnes à observer
 print("Please choose a first column between these : ")
@@ -32,8 +49,8 @@ column1 = np.asarray(data[first_input])
 column2 = np.asarray(data[second_input])
 
 # Filtrage des valeurs nulles
-column1 = list(filter(lambda x:x > 0, column1))
-column2 = list(filter(lambda x:x > 0, column2))
+column1 = list(filter(lambda x:x != 0, column1))
+column2 = list(filter(lambda x:x != 0, column2))
 
 # Recoupage des colonnes pour avoir la même taille
 if len(column1) > len(column2):
@@ -41,10 +58,14 @@ if len(column1) > len(column2):
 elif len(column2) > len(column1):
     column2 = column2[:len(column1)]
 
+#creation de la liste de valeur récupéré
 my_plot = np.column_stack((column1, column2))
 
 # Selection de valeurs randoms dans les colonnes à observer
-randomRow = np.random.randint(len(column1), size=100)
+if (len(column1) < 100):
+    randomRow = np.random.randint(len(column1), size=len(column1))
+else:
+    randomRow = np.random.randint(len(column1), size=100)
 my_plot = my_plot[randomRow, :]
 
 choice = input("You can choose between [S]catter plot or [D]endogram\n")
@@ -56,13 +77,15 @@ if choice in ['S', 's']:
     plt.xlabel(first_input)
     plt.ylabel(second_input)
     plt.show()
-    input("Press enter to continue\n")
+    input("Press enter to continue")
 elif choice in ['D', 'd']:
     my_link = linkage(my_plot, 'ward')
     plt.figure(figsize=(25, 10))
     dendrogram(my_link, leaf_rotation=90, leaf_font_size=8)
+    plt.xlabel(first_input)
+    plt.ylabel(second_input)
     plt.show()
     input("Press enter to continue\n")
 else:
-    print("Sorry I don't recognise this input\n End of program\n")
-print("Program finished, time to drink coffee.\"")
+    print("Sorry I don't recognise this input\n End of program")
+print("Program finished, time to drink coffee.")

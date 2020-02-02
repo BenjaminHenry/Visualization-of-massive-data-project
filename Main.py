@@ -54,18 +54,12 @@ if second_input in my_type:
 else:
     print("wrong input sorry, program restarting")
     exit(0)
+
+#Filtrage des valeurs nulles
+data = data.loc[data[first_input] != 0]
+data = data.loc[data[second_input] != 0]
 column1 = np.asarray(data[first_input])
 column2 = np.asarray(data[second_input])
-
-# Filtrage des valeurs nulles
-column1 = list(filter(lambda x:x != 0, column1))
-column2 = list(filter(lambda x:x != 0, column2))
-
-# Recoupage des colonnes pour avoir la même taille
-if len(column1) > len(column2):
-    column1 = column1[:len(column2)]
-elif len(column2) > len(column1):
-    column2 = column2[:len(column1)]
 
 #creation de la liste de valeur récupéré
 my_plot = np.column_stack((column1, column2))

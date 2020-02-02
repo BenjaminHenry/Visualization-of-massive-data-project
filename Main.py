@@ -10,7 +10,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn import svm
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
-
+'''
 # Chargement du fichier CSV
 my_csvs = []
 my_files = listdir(os.getcwd())
@@ -20,6 +20,7 @@ for my_files in my_files:
 if len(my_csvs) == 1:
     print("1 csv file detected :", my_csvs)
     print("Using :", my_csvs)
+    my_chosenfile = str(my_csvs).strip('[]')
 elif len(my_csvs) > 1:
     print("please select a file between these .csv found :", my_csvs)
     my_chosenfile = input()
@@ -31,8 +32,8 @@ if my_chosenfile.casefold() in str(my_csvs).strip('[]').casefold():
 else:
     print("Sorry, wrong selection, exiting program")
     exit(0)
-data = pd.read_csv(my_chosenfile, index_col=0)
-
+'''
+data = pd.read_csv("data.csv", index_col=0)
 
 #selection des colonne de type int ou float pour proposer le choix à l'utilisateur
 my_type = list(data.select_dtypes(include=['int64']).columns)

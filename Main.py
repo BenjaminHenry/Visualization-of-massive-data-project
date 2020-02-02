@@ -136,8 +136,8 @@ def plot_polynom_sample(polynom, x_train, y_train):
              x_test,
              y_test,
              'x',
-             x_plot, 
-             np.polyval(polynom, x_plot), '-')
+             x_plot,
+             np.polyval(polynom, x_plot[::-1]), '-')
     plt.legend(['training set', 'test set', 'model'], loc='best')
     plt.xlabel('price')
     plt.ylabel('minimum_nights')
@@ -173,7 +173,7 @@ def compute_training_error(polynom, x_train, y_train):
     return mean_square_error
 
 # degré d'entraînement, plus élevé = plus précis, trop élevé = overfitting
-degree = 3
+degree = 8
 
 poly = np.polyfit(x_train, y_train, degree)
 print(f"mean square error on training set: {compute_training_error(poly, x_train, y_train)}")

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import random
 
 from os import listdir
 from sklearn.cluster import AgglomerativeClustering
@@ -90,14 +91,93 @@ elif choice in ['D', 'd']:
 else:
     print("Sorry I don't recognise this input\n End of program")
 
-#start of test for predictive model of one column as a function of another column
-#clf = svm.SVC(gamma=0.001, C=100)
-#clf.fit(my_plot.data[:-1], my_plot.target[:-1])
-#clf.predict(my_plot.data[:-1])
+# PART 2 : Quantitive analysis
 
-#neigh = KNeighborsClassifier(n_neighbors=3)
-#neigh.fit(my_plot, my_plot)
-#pred = neigh.predict(my_plot)
-#print("KNeighbors accuracy score : ", accuracy_score(my_plot, pred))
+column1 = np.asarray(data['price'])
+column2 = np.asarray(data['minimum_nights'])
+
+# Filtrage des valeurs nulles
+column1 = list(filter(lambda x:x != 0, column1))
+column2 = list(filter(lambda x:x != 0, column2))
+
+xlim_left = min(column1)
+xlim_right = max(column1)
+ylim_top = max(column2)
+ylim_bottom = min(column2)
+
+"""
+randomly select training set and test set from the dataset
+"""
+
+nb_points = len(column1)
+nb_training_points = int(0.7 * nb_points)
+training_indexes = random.sample(range(nb_points), nb_training_points)
+test_indexes = [index for index in range(nb_points)
+                if index not in training_indexes]
+
+x_train = [column1[i] for i in training_indexes]
+y_train = [column2[i] for i in training_indexes]
+x_test = [column1[i] for i in test_indexes]
+y_test = [column2[i] for i in test_indexes]
+
+
+def plot_polynom_sample(polynom, x_train, y_train):
+    """
+        Plot the result of fitting the polynom
+        to the training set
+    """
+    degree = len(polynom)-1
+    title = f"Polynomial fit on training set, degree={degree}"
+    filename = f"Fit_degree_{degree}.pdf"
+    x_plot = np.linspace(xlim_left, xlim_right, 500)
+    plt.plot(x_train,
+             y_train,
+             'o',
+             x_test,
+             y_test,
+             'x',
+             x_plot, 
+             np.polyval(polynom, x_plot), '-')
+    plt.legend(['training set', 'test set', 'model'], loc='best')
+    plt.xlabel('price')
+    plt.ylabel('minimum_nights')
+    plt.xlim(xlim_left, xlim_right)
+    plt.ylim(ylim_bottom, ylim_top)
+    plt.title(title)
+    plt.savefig(filename)
+    plt.close()
+
+def compute_test_error(polynom, x_test, y_test):
+    """
+        Evaluate the quality of out model on the test set.
+        We compute the Mean Square Error.
+    """
+    # compare prediction to ground truth
+    errors = np.polyval(polynom, x_test) - y_test
+    square_errors = [error**2 for error in errors]
+    total_error = sum(square_errors)
+    mean_square_error = total_error/len(square_errors)
+    return mean_square_error
+
+
+def compute_training_error(polynom, x_train, y_train):
+    """
+        Evaluate the quality of out model on the training set.
+        We compute the Mean Square Error.
+    """
+    # compare prediction to ground truth
+    errors = np.polyval(polynom, x_train) - y_train
+    square_errors = [error**2 for error in errors]
+    total_error = sum(square_errors)
+    mean_square_error = total_error/len(square_errors)
+    return mean_square_error
+
+# degré d'entraînement, plus élevé = plus précis, trop élevé = overfitting
+degree = 3
+
+poly = np.polyfit(x_train, y_train, degree)
+print(f"mean square error on training set: {compute_training_error(poly, x_train, y_train)}")
+print(f"mean square error on test set: {compute_test_error(poly, x_test, y_test)}")
+plot_polynom_sample(poly, x_train, y_train)
 
 print("Program finished, time to drink coffee.")
